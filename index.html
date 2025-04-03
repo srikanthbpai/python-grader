@@ -3,45 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Code Grader</title>
+    <title>Python Grader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+        textarea {
+            width: 80%;
+            height: 150px;
+            margin: 10px 0;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
 </head>
 <body>
-    <h1>Python Code Grader</h1>
+    <h1>Python Grader</h1>
+    <p>Enter your name and Python code below:</p>
 
-    <label for="nameInput">Your Name:</label>
-    <input type="text" id="nameInput" placeholder="Enter your name" required>
+    <input type="text" id="name" placeholder="Enter your name" required>
+    <br>
+    <textarea id="code" placeholder="Write your Python code here..." required></textarea>
+    <br>
+    <button id="submit">Submit Code</button>
 
-    <label for="codeInput">Your Python Code:</label>
-    <textarea id="codeInput" placeholder="Enter your Python code" rows="10"></textarea>
-
-    <button onclick="submitCode()">Submit</button>
-
-    <p id="responseMessage"></p>
+    <p id="result"></p>
 
     <script>
-        function submitCode() {
-            let code = document.getElementById("codeInput").value; // Get student code
-            let studentName = document.getElementById("nameInput").value; // Get student name
+        const API_URL = "https://script.google.com/macros/s/AKfycby1UxrSiPaA-vsXfb7zvliLAZRbjDlN-IBvOlXG3wwLP5C7t28BzMmMFkqOsJKkj38b3A/exec";
 
-            if (!studentName || !code) {
-                alert("Please enter both name and code before submitting.");
+        document.getElementById("submit").addEventListener("click", function() {
+            let name = document.getElementById("name").value.trim();
+            let code = document.getElementById("code").value.trim();
+
+            if (!name || !code) {
+                alert("Please enter your name and code.");
                 return;
             }
 
-            fetch("https://script.google.com/macros/s/AKfycbxvsam6LZXxc0KJ7fvempRbPlFWBXQrr3d5GCnwlXIKo7BR4PWJkTmYBAobhHhPj89znQ/exec", {
+            fetch(API_URL, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: studentName, code: code })
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name: name, code: code })
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("responseMessage").innerText = "Submission Successful: " + data.message;
+                console.log("Response:", data);
+                document.getElementById("result").innerText = data.message;
             })
             .catch(error => {
                 console.error("Error:", error);
-                document.getElementById("responseMessage").innerText = "Submission failed. Try again.";
+                document.getElementById("result").innerText = "Error submitting code.";
+                document.getElementById("result").style.color = "red";
             });
-        }
+        });
     </script>
 </body>
 </html>
