@@ -3,73 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Grader</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            text-align: center;
-        }
-        textarea {
-            width: 80%;
-            height: 150px;
-            margin: 10px 0;
-        }
-        input, button {
-            margin: 10px;
-            padding: 10px;
-            font-size: 16px;
-        }
-        #result {
-            margin-top: 20px;
-            font-weight: bold;
-            color: green;
-        }
-    </style>
-</head>
-<body>
-    <h1>Python Grader</h1>
-    <p>Enter your name and Python code below:</p>
-
-    <input type="text" id="name" placeholder="Enter your name" required>
-    <br>
-    <textarea id="code" placeholder="Write your Python code here..." required></textarea>
-    <br>
-    <button id="submit">Submit Code</button>
-
-    <p id="result"></p>
-
+    <title>Python Code Grader</title>
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycby1UxrSiPaA-vsXfb7zvliLAZRbjDlN-IBvOlXG3wwLP5C7t28BzMmMFkqOsJKkj38b3A/exec";
-
-        document.getElementById("submit").addEventListener("click", function() {
-            let name = document.getElementById("name").value.trim();
-            let code = document.getElementById("code").value.trim();
+        async function submitCode() {
+            const name = document.getElementById("name").value;
+            const code = document.getElementById("code").value;
+            const resultDiv = document.getElementById("result");
 
             if (!name || !code) {
-                alert("Please enter your name and code.");
+                resultDiv.innerHTML = "<p style='color: red;'>Please enter your name and Python code.</p>";
                 return;
             }
 
-            fetch(API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ name: name, code: code })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Response:", data);
-                document.getElementById("result").innerText = data.message;
-            })
-            .catch(error => {
+            try {
+                const response = await fetch("https://script.google.com/macros/s/AKfycby1UxrSiPaA-vsXfb7zvliLAZRbjDlN-IBvOlXG3wwLP5C7t28BzMmMFkqOsJKkj38b3A/exec", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: name, code: code }),
+                });
+
+                const result = await response.json();
+                resultDiv.innerHTML = `<p style='color: green;'>${result.message}</p>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<p style='color: red;'>Submission failed. Try again.</p>`;
                 console.error("Error:", error);
-                document.getElementById("result").innerText = "Error submitting code.";
-                document.getElementById("result").style.color = "red";
-            });
-        });
+            }
+        }
     </script>
+</head>
+<body>
+    <h2>Python Code Grader</h2>
+    <label for="name">Your Name:</label>
+    <input type="text" id="name" placeholder="Enter your name"><br><br>
+
+    <label for="code">Python Code:</label><br>
+    <textarea id="code" rows="6" cols="50" placeholder="Enter your Python code here"></textarea><br><br>
+
+    <button onclick="submitCode()">Submit Code</button>
+
+    <div id="result"></div>
 </body>
 </html>
