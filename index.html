@@ -6,31 +6,41 @@
     <title>Python Code Grader</title>
 </head>
 <body>
-    <h2>Submit Your Python Code</h2>
-    
-    <label for="nameInput">Enter your name:</label>
-    <input type="text" id="nameInput" placeholder="Your Name"><br><br>
+    <h1>Python Code Grader</h1>
 
-    <label for="codeInput">Enter your Python Code:</label><br>
-    <textarea id="codeInput" rows="10" cols="50" placeholder="Write your Python code here..."></textarea><br><br>
+    <label for="nameInput">Your Name:</label>
+    <input type="text" id="nameInput" placeholder="Enter your name" required>
+
+    <label for="codeInput">Your Python Code:</label>
+    <textarea id="codeInput" placeholder="Enter your Python code" rows="10"></textarea>
 
     <button onclick="submitCode()">Submit</button>
-    <p id="result"></p>
+
+    <p id="responseMessage"></p>
 
     <script>
         function submitCode() {
-            var name = document.getElementById("nameInput").value;
-            var code = document.getElementById("codeInput").value;
-            var url = "https://script.google.com/macros/s/AKfycbxC8s6NQLjtHD5ok-m09xUJGbClFwHCGEmtr2cOVP4wMV_fAtRvZIl1GK1kVcU6Jk3LLg/exec"; 
+            let code = document.getElementById("codeInput").value; // Get student code
+            let studentName = document.getElementById("nameInput").value; // Get student name
 
-            fetch(url, {
+            if (!studentName || !code) {
+                alert("Please enter both name and code before submitting.");
+                return;
+            }
+
+            fetch("https://script.google.com/macros/s/AKfycbxvsam6LZXxc0KJ7fvempRbPlFWBXQrr3d5GCnwlXIKo7BR4PWJkTmYBAobhHhPj89znQ/exec", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: name, code: code })
+                body: JSON.stringify({ name: studentName, code: code })
             })
             .then(response => response.json())
-            .then(data => document.getElementById("result").innerText = "Result: " + data.output)
-            .catch(error => document.getElementById("result").innerText = "Error: " + error);
+            .then(data => {
+                document.getElementById("responseMessage").innerText = "Submission Successful: " + data.message;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("responseMessage").innerText = "Submission failed. Try again.";
+            });
         }
     </script>
 </body>
