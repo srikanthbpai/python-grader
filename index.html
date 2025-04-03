@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Grader</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        textarea { width: 80%; height: 150px; margin-bottom: 10px; }
+        button { padding: 10px 20px; }
+        #result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Submit Your Python Code</h2>
+    <textarea id="codeInput" placeholder="Write your Python code here..."></textarea><br>
+    <button onclick="submitCode()">Run Code</button>
+    <p id="result"></p>
+
+    <script>
+        function submitCode() {
+            let code = document.getElementById("codeInput").value;
+            let resultDiv = document.getElementById("result");
+
+            fetch("https://script.google.com/macros/s/AKfycbwZ8j3GC6Ei0PyJqTMSYxDRFReHthorV_nZ7RINHDLf35D57S4MF4W86fukULB9MCKLrA/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultDiv.innerHTML = "Result: " + (data.result || "Error") + "<br>Output: " + (data.output || "No output");
+            })
+            .catch(error => {
+                resultDiv.innerHTML = "Error: " + error;
+            });
+        }
+    </script>
+</body>
+</html>
